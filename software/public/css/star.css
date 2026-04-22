@@ -162,7 +162,7 @@
       background-size: 30px auto;
     }
   }
-  
+  ///////////
   @media screen and (-ms-high-contrast: active) {
     .starability-basic {
       width: auto;
