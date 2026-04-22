@@ -32,4 +32,12 @@ const products = [
         price: 100000,
         desc: "slick"
     }
-];
+]
+
+async function seedDB(){
+    
+    await Product.insertMany(products);
+    console.log("data seeded successfully");
+}
+
+module.exports = seedDB;

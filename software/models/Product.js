@@ -19,7 +19,19 @@ const productSchema = new mongoose.Schema({
     desc: {
         type: String,
         trim:true
-    }  
+    }  ,
+    reviews:[
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Review'
+        }
+    ]
+})
+
+productSchema.post('findOneAndDelete' , async function(product){
+    if(product.reviews.length > 0){
+        await Review.deleteMany({_id:{$in:product.reviews}})
+    }
 })
 
 let Product = mongoose.model('Product', productSchema);
