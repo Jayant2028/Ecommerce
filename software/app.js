@@ -10,6 +10,13 @@ const reviewRoutes = require('./routes/review')
 const flash = require('connect-flash');
 const session = require('express-session');
 
+const authRoutes = require('./routes/auth')
+
+const flash = require('connect-flash');
+const session = require('express-session');
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+const User = require('./models/User');
 
 
 mongoose.connect('mongodb://127.0.0.1:27017/test')
@@ -19,10 +26,16 @@ mongoose.connect('mongodb://127.0.0.1:27017/test')
     console.log(err);
 })
 
+// session 
 let configSession = {
     secret: 'keyboard cat',
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true , 
+    cookie: { 
+        httpOnly: true ,
+        expires: Date.now() + 24*7*60*60*1000 , 
+        maxAge:24*7*60*60*1000
+    }
 }
 
 
@@ -34,18 +47,26 @@ app.use(express.urlencoded({extended:true}));
 app.use(methodOverride('_method'));
 app.use(session(configSession)); 
 app.use(flash());
+
+app.use(passport.initialize());
+app.use(passport.session());
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
 app.use((req,res,next)=>{
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
     next();
 })
 
+passport.use(new LocalStrategy(User.authenticate()));
+
 // seeding db
 // seeddb()
 
 app.use(productRoutes); //check path for every incomeing req
 app.use(reviewRoutes); //  check path for every incomeing req
-
+app.use(authRoutes);
 
 app.listen(8000, () => {
     console.log("SERVER IS ONLINE 8080");
