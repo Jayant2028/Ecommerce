@@ -6,45 +6,76 @@ const {validateProduct} = require('../middleware')
 
 //  products
 router.get('/products' , async(req,res)=>{
-    let products = await Product.find({});
+    try{let products = await Product.find({});
     res.render('products/index' , {products});
+}
+    catch(e){
+        res.status(500).render('error' , {err:e.message});
+    }
 })
 
 
 // new product
 router.get('/product/new' , (req,res)=>{
-    res.render('products/new');
+     try{
+        res.render('products/new');
+    }
+    catch(e){
+        res.status(500).render('error' , {err:e.message});
+    }
 })
 
 // add product
 router.post('/products' , async(req,res)=>{
-    let {name , img , price , desc} = req.body;
-    await Product.create({name , img , price , desc})
-    res.redirect('/products');
+    try{
+        let {name , img , price , desc} = req.body;
+        await Product.create({name , img , price , desc})
+        req.flash('success' , 'Product added successfully');
+        res.redirect('/products');
+    }
+    catch(e){
+        res.status(500).render('error' , {err:e.message});
+    }
 })
 
 
 // particular product
 router.get('/products/:id' , async(req,res)=>{
-    let {id} = req.params;
-    let foundProduct = await Product.findById(id).populate('reviews');
-    res.render('products/show' , {foundProduct})
+    try{
+        let {id} = req.params;
+        let foundProduct = await Product.findById(id).populate('reviews');
+        res.render('products/show' , {foundProduct , msg:req.flash('msg')})
+    }
+    catch(e){
+        res.status(500).render('error' , {err:e.message});
+    }
 })
 
 
 //edit the product
 router.get('/products/:id/edit' , async(req,res)=>{
-    let {id} = req.params;
-    let foundProduct = await Product.findById(id);
-    res.render('products/edit' , {foundProduct})
+    try{
+        let {id} = req.params;
+        let foundProduct = await Product.findById(id);
+        res.render('products/edit' , {foundProduct})
+    }
+    catch(e){
+        res.status(500).render('error' , {err:e.message});
+    }
 })
 
 //edit the data in database
 router.patch('/products/:id' , async(req,res)=>{
-    let {id} = req.params;
-    let {name , img , price , desc} = req.body;
-    await Product.findByIdAndUpdate( id , {name , img , price , desc}  )
-    res.redirect(`/products/${id}`);
+    try{
+        let {id} = req.params;
+        let {name , img , price , desc} = req.body;
+        await Product.findByIdAndUpdate( id , {name , img , price , desc}  )
+        req.flash('success' , 'Product edited successfully');
+        res.redirect(`/products/${id}`);
+    }
+    catch(e){
+        res.status(500).render('error' , {err:e.message});
+    }
 })
 
 
@@ -59,6 +90,7 @@ router.delete('/products/:id' , async(req,res)=>{
         }
 
         await Product.findByIdAndDelete(id);
+        req.flash('success' , 'Product deleted successfully');
         res.redirect('/products');
     }
     catch(e){
