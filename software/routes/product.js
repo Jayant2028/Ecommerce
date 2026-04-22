@@ -1,21 +1,22 @@
 const express = require('express');
 const Product = require('../models/Product');
 const Review = require('../models/Review');
-const router = express.Router() //mini instance
+const router = express.Router() 
+const {validateProduct} = require('../middleware')
 
-// to show all the products
+//  products
 router.get('/products' , async(req,res)=>{
     let products = await Product.find({});
     res.render('products/index' , {products});
 })
 
 
-// to show the form for new product
+// new product
 router.get('/product/new' , (req,res)=>{
     res.render('products/new');
 })
 
-// to actually add the product
+// add product
 router.post('/products' , async(req,res)=>{
     let {name , img , price , desc} = req.body;
     await Product.create({name , img , price , desc})
@@ -23,7 +24,7 @@ router.post('/products' , async(req,res)=>{
 })
 
 
-// to show a particular product
+// particular product
 router.get('/products/:id' , async(req,res)=>{
     let {id} = req.params;
     let foundProduct = await Product.findById(id).populate('reviews');
@@ -31,7 +32,7 @@ router.get('/products/:id' , async(req,res)=>{
 })
 
 
-// form to edit the product
+//edit the product
 router.get('/products/:id/edit' , async(req,res)=>{
     let {id} = req.params;
     let foundProduct = await Product.findById(id);
@@ -49,15 +50,20 @@ router.patch('/products/:id' , async(req,res)=>{
 
 // delete a product
 router.delete('/products/:id' , async(req,res)=>{
-    let {id} = req.params;
-    const product = await Product.findById(id);
+    try{
+        let {id} = req.params;
+        const product = await Product.findById(id);
 
-    for(let id of product.reviews){
-        await Review.findByIdAndDelete(id);
+        for(let id of product.reviews){
+            await Review.findByIdAndDelete(id);
+        }
+
+        await Product.findByIdAndDelete(id);
+        res.redirect('/products');
     }
-
-    await Product.findByIdAndDelete(id);
-    res.redirect('/products');
+    catch(e){
+        res.status(500).render('error' , {err : e.message});
+    }
 })
 
 
