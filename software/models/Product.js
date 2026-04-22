@@ -1,5 +1,5 @@
 const mongoose= require('mongoose');
-
+const Review = require('./Review');
 const productSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -29,7 +29,7 @@ const productSchema = new mongoose.Schema({
 })
 
 productSchema.post('findOneAndDelete' , async function(product){
-    if(product.reviews.length > 0){
+    if(product.reviews.length >0){
         await Review.deleteMany({_id:{$in:product.reviews}})
     }
 })
