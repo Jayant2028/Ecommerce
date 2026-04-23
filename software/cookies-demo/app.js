@@ -15,15 +15,15 @@ app.get('/' , (req,res)=>{
 })
 // signed cookie
 app.get('/getsignedcookies' , (req,res)=>{
-    res.cookie('bindaas' , 'sachin' , {signed:true} )
+    res.cookie('bindas' , 'sachin' , {signed:true} )
     res.send('cokkies sent successfully');
 })
 
 
 // app.get('/setcookie' , (req,res)=>{
 //     res.cookie('mode' , 'dark');
-//     res.cookie('location' , 'delhi');
-//     res.cookie('username' , 'samarth');
+//     res.cookie('location' , 'Mathura');
+//     res.cookie('username' , 'Blah');
 //     res.send('server sent you cookies');
 // })
 

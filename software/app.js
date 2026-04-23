@@ -8,11 +8,8 @@ const methodOverride = require('method-override')
 const productRoutes = require('./routes/product')
 const reviewRoutes = require('./routes/review')
 const flash = require('connect-flash');
-const session = require('express-session');
-
+const engine = require('ejs-mate');
 const authRoutes = require('./routes/auth')
-
-const flash = require('connect-flash');
 const session = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
@@ -50,6 +47,11 @@ app.use(flash());
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use((req,res,next)=>{
+    res.locals.currentUser = req.user;
+    next();
+});
+
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
@@ -61,13 +63,13 @@ app.use((req,res,next)=>{
 
 passport.use(new LocalStrategy(User.authenticate()));
 
-// seeding db
-// seeddb()
+//  seeding db
+//  seedDB()
 
 app.use(productRoutes); //check path for every incomeing req
 app.use(reviewRoutes); //  check path for every incomeing req
 app.use(authRoutes);
 
-app.listen(8000, () => {
+app.listen(8080, () => {
     console.log("SERVER IS ONLINE 8080");
 });
